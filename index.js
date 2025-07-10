@@ -1,6 +1,7 @@
 const express = require('express')
 
 const app = express()
+const host = '0.0.0.0'
 const port = 80
 
 app.get('/', (req, res)=>{
@@ -11,4 +12,4 @@ app.get('/health', (req, res)=>{
     res.json({message:'Health checked'})
 })
 
-app.listen(port, ()=>console.log('Server running on port:', port))
+app.listen(port, host, ()=>console.log('Server running on port:', port))
