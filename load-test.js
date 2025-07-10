@@ -9,7 +9,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://nodejs-test-alb-955479765.ap-southeast-1.elb.amazonaws.com/');
+  const res = http.get('{ELB DNS}');
   const instanceId = res.json('instanceId') || 'unknown';
 
   console.log(`instance=${instanceId}`);
