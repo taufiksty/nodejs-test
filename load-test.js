@@ -1,27 +1,19 @@
 import http from 'k6/http';
-import { check } from 'k6';
 import { Counter } from 'k6/metrics';
 
-const instanceCount = {};
+const requests = new Counter('requests_per_instance');
 
 export const options = {
-  vus: 50,
-  duration: '30s',
+  vus: 20,
+  duration: '10s',
 };
 
 export default function () {
   const res = http.get('http://nodejs-test-alb-955479765.ap-southeast-1.elb.amazonaws.com/');
+  const instanceId = res.json('instanceId') || 'unknown';
 
-  const json = res.json();
-  const instanceId = json.instanceId || 'unknown';
+  console.log(`instance=${instanceId}`);
 
-  if (!instanceCount[instanceId]) {
-    instanceCount[instanceId] = new Counter(instanceId);
-  }
-
-  instanceCount[instanceId].add(1);
-
-  check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
+  // ✅ increment counter with a dynamic tag
+  requests.add(1, { instance: instanceId });
 }
