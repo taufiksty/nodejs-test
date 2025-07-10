@@ -1,15 +1,27 @@
-const express = require('express')
+const express = require('express');
+const os = require('os');
+const fs = require('fs');
 
-const app = express()
-const host = '0.0.0.0'
-const port = 80
+const app = express();
+const port = 80;
 
-app.get('/', (req, res)=>{
-    res.json({message:'This is main route'})
-})
+// Read EC2 metadata (instance-id)
+let instanceId = 'unknown';
+try {
+  instanceId = fs.readFileSync('/var/lib/cloud/data/instance-id', 'utf-8');
+} catch (e) {
+  instanceId = os.hostname(); // fallback
+}
 
-app.get('/health', (req, res)=>{
-    res.json({message:'Health checked'})
-})
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Hello from EC2',
+    instanceId: instanceId.trim(),
+    hostname: os.hostname(),
+    ip: req.socket.localAddress
+  });
+});
 
-app.listen(port, host, ()=>console.log('Server running on port:', port))
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
